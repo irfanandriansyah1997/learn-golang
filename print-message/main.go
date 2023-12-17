@@ -1,8 +1,8 @@
 package main
 
-import "fmt"
+import fmt2 "fmt"
 
 func main() {
-	fmt.Println("Hello World")
-	fmt.Printf("Hi my name is %v, I %v years old \n", "Irfan", 16)
+	fmt2.Println("Hello World")
+	fmt2.Printf("Hi my name is %v, I %v years old \n", "Irfan", 16)
 }
