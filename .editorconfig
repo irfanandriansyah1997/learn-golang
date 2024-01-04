@@ -10,3 +10,8 @@ indent_size = 4
 [{.travis.yml,npm-shrinkwrap.json,package.json}]
 indent_style = space
 indent_size = 2
+
+[*.{yaml,yml}]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = false

@@ -1,0 +1,3 @@
+module learn-if
+
+go 1.21.0
