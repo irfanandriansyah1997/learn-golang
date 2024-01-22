@@ -1,4 +1,4 @@
-package enytities
+package entities
 
 type TransactionStatus uint
 

@@ -1,4 +1,4 @@
-package enytities
+package entities
 
 type OptimizeAsset struct {
 	Size    string `json:"sizes"`
