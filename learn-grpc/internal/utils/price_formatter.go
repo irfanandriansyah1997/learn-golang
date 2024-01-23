@@ -8,14 +8,14 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
-func FormattingPrice(price any) (entities.Price, error) {
+func FormattingPrice(price any) (*entities.Price, error) {
 	switch val := price.(type) {
 	case int:
-		return entities.Price{
+		return &entities.Price{
 			Value:          int32(val),
 			FormattedValue: fmt.Sprintf("Rp %s", humanize.CommafWithDigits(float64(val), 0)),
 		}, nil
 	}
 
-	return entities.Price{}, errors.New("price is not integer")
+	return nil, errors.New("price is not integer")
 }

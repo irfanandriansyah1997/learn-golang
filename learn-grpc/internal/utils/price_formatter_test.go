@@ -7,7 +7,6 @@ import (
 )
 
 func TestFormattingPrice(t *testing.T) {
-
 	testCases := []entities.Fixture[any, string]{
 		{
 			Title:         "integer argument",
@@ -58,7 +57,7 @@ func TestFormattingPrice(t *testing.T) {
 			}
 
 			// INFO: Expected output from method is similar with attribute ExpectedValue
-			if result.FormattedValue != testCase.ExpectedValue {
+			if result != nil && result.FormattedValue != testCase.ExpectedValue {
 				t.Errorf("FormattingPrice().FormattedValue returning mismatch output %s with %s", testCase.ExpectedValue, result.FormattedValue)
 			}
 		})
