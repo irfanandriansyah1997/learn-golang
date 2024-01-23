@@ -1,8 +1,17 @@
 package entities
 
+type AssetRatio string
+
+// transaction status enum
+const (
+	MobileRatio  AssetRatio = "320w"
+	TabletRatio  AssetRatio = "640w"
+	DesktopRatio AssetRatio = "800w"
+)
+
 type OptimizeAsset struct {
-	Size    string `json:"sizes"`
-	UrlPath string `json:"url"`
+	Size    AssetRatio `json:"sizes"`
+	UrlPath string     `json:"url"`
 }
 
 type Asset struct {
