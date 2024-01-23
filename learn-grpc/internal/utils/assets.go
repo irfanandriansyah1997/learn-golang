@@ -33,7 +33,7 @@ func GenerateOptimizeAsset(imageURL string) (*entities.Asset, error) {
 	isImageUrl := isImage(imageURL)
 
 	if err == nil && isImageUrl {
-		// TODO: need to create func for check asset on S3 & GCS
+		// TODO: need to create function to check asset is available on S3 & GCS
 
 		formattedOptimizeAsset := make([]entities.OptimizeAsset, 0)
 		formattedOptimizeAssetHTML := make([]string, 0)
