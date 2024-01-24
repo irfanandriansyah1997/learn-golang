@@ -1,9 +1,30 @@
 package entities
 
+import "time"
+
+type baseUser struct {
+	ID   string `json:"user_id"`
+	Name string `json:"username"`
+}
+
+///////////////////////////////////////////////////////////
+// User Model
+// INFO: this model will be used for response API / GQL
+///////////////////////////////////////////////////////////
+
 type User struct {
-	ID               uint   `json:"user_id"`
-	Name             string `json:"username"`
-	RegisteredDate   Date   `json:"registered_dated"`
-	LastActivityDate Date   `json:"last_activity_dated"`
-	Avatar           Asset  `json:"avatar"`
+	baseUser
+	RegisteredDate   time.Time `json:"registered_date"`
+	LastActivityDate time.Time `json:"last_activity_date"`
+	Avatar           Asset     `json:"avatar"`
+}
+
+///////////////////////////////////////////////////////////
+// User Request Model
+// INFO: this model will be used for parameters API / GQL
+///////////////////////////////////////////////////////////
+
+type UserRequest struct {
+	baseUser
+	Avatar string `json:"avatar"`
 }

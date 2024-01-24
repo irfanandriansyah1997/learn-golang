@@ -6,22 +6,22 @@ import "context"
 // Repository Section
 ///////////////////////////////////////////////////////////
 
-type GenericRepo[payload any, id any] interface {
-	Create(context.Context, payload) payload
+type GenericRepo[arg, payload, id any] interface {
+	Create(context.Context, arg) payload
 	FindAll(context.Context) []payload
-	FindByID(context.Context, id) (payload, error)
+	FindByID(context.Context, id) (*payload, error)
 	Delete(context.Context, id) bool
-	Update(context.Context, id, payload) payload
+	Update(context.Context, id, arg) *payload
 }
 
 ///////////////////////////////////////////////////////////
 // Service Section
 ///////////////////////////////////////////////////////////
 
-type GenericService[payload any, id any] interface {
-	Create(context.Context, payload) payload
+type GenericService[arg, payload, id any] interface {
+	Create(context.Context, arg) payload
 	FindAll(context.Context) []payload
 	FindByID(context.Context, id) (payload, error)
 	Delete(context.Context, id) bool
-	Update(context.Context, id, payload) payload
+	Update(context.Context, id, arg) payload
 }

@@ -32,6 +32,8 @@ func GenerateOptimizeAsset(imageURL string) (*entities.Asset, error) {
 	_, err := url.ParseRequestURI(imageURL)
 	isImageUrl := isImage(imageURL)
 
+	fmt.Sprint(err, isImageUrl)
+
 	if err == nil && isImageUrl {
 		// TODO: need to create function to check asset is available on S3 & GCS
 
@@ -56,5 +58,4 @@ func GenerateOptimizeAsset(imageURL string) (*entities.Asset, error) {
 	}
 
 	return nil, fmt.Errorf("this url %s is not image", imageURL)
-
 }

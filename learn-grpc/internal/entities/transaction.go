@@ -1,5 +1,7 @@
 package entities
 
+import "time"
+
 type TransactionStatus uint
 
 // transaction status enum
@@ -8,15 +10,48 @@ const (
 	Unpaid
 )
 
+///////////////////////////////////////////////////////////
+// Base Transaction Model
+///////////////////////////////////////////////////////////
+
+type BaseTransaction struct {
+	ID     string            `json:"transaction_id"`
+	Status TransactionStatus `json:"status"`
+}
+
+type baseTransactionProduct struct {
+	Quantity int `json:"quantity"`
+}
+
+///////////////////////////////////////////////////////////
+// Transaction Model
+// INFO: this model will be used for response API / GQL
+///////////////////////////////////////////////////////////
+
 type TransactionProduct struct {
-	ProductID uint `json:"product_id"`
-	Quantity  int  `json:"quantity"`
+	baseTransactionProduct
+	Date    time.Time `json:"transaction_date"`
+	Product Product   `json:"product"`
 }
 
 type Transaction struct {
-	ID       uint                 `json:"transaction_id"`
-	Date     Date                 `json:"transaction_date"`
-	Status   TransactionStatus    `json:"status"`
-	UserID   uint                 `json:"user_id"`
-	Products []TransactionProduct `json:"transaction_prpoducts"`
+	BaseTransaction
+	User     User                 `json:"user"`
+	Products []TransactionProduct `json:"transaction_products"`
+}
+
+///////////////////////////////////////////////////////////
+// Transaction Request Model
+// INFO: this model will be used for parameters API / GQL
+///////////////////////////////////////////////////////////
+
+type TransactionProductRequest struct {
+	baseTransactionProduct
+	ProductID string `json:"product_id"`
+}
+
+type TransactionRequest struct {
+	BaseTransaction
+	UserID   string                      `json:"user_id"`
+	Products []TransactionProductRequest `json:"transaction_products"`
 }
