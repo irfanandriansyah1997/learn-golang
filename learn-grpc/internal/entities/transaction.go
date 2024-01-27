@@ -16,10 +16,11 @@ const (
 
 type BaseTransaction struct {
 	ID     string            `json:"transaction_id"`
+	Date   time.Time         `json:"transaction_date"`
 	Status TransactionStatus `json:"status"`
 }
 
-type baseTransactionProduct struct {
+type BaseTransactionProduct struct {
 	Quantity int `json:"quantity"`
 }
 
@@ -29,15 +30,14 @@ type baseTransactionProduct struct {
 ///////////////////////////////////////////////////////////
 
 type TransactionProduct struct {
-	baseTransactionProduct
-	Date    time.Time `json:"transaction_date"`
-	Product Product   `json:"product"`
+	BaseTransactionProduct
+	Product Product `json:"product"`
 }
 
 type Transaction struct {
 	BaseTransaction
-	User     User                 `json:"user"`
 	Products []TransactionProduct `json:"transaction_products"`
+	User     User                 `json:"user"`
 }
 
 ///////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ type Transaction struct {
 ///////////////////////////////////////////////////////////
 
 type TransactionProductRequest struct {
-	baseTransactionProduct
+	BaseTransactionProduct
 	ProductID string `json:"product_id"`
 }
 

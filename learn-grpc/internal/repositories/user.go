@@ -45,6 +45,8 @@ func (u *_UserRepoImpl) Create(_ context.Context, req entities.UserRequest) enti
 	newUser.RegisteredDate = time.Now()
 	newUser.LastActivityDate = time.Now()
 
+	u.user = append(u.user, newUser)
+
 	return newUser
 }
 
@@ -53,16 +55,24 @@ func (u *_UserRepoImpl) FindAll(_ context.Context) []entities.User {
 }
 
 func (u *_UserRepoImpl) FindByID(_ context.Context, id string) (*entities.User, error) {
-	var user *entities.User
+	var (
+		user        entities.User
+		isAvailable = false
+	)
 
 	for _, item := range u.user {
 		if item.ID == id {
-			user = &item
+			user = item
+			isAvailable = true
+		}
+
+		if isAvailable {
+			break
 		}
 	}
 
-	if user != nil {
-		return user, nil
+	if isAvailable {
+		return &user, nil
 	}
 
 	return nil, utils.NewNotFoundError(fmt.Sprintf("user %s is not found", id))
@@ -79,7 +89,7 @@ func (u *_UserRepoImpl) Delete(_ context.Context, id string) bool {
 	}
 
 	if !isAvailable {
-		utils.PanicIfNotFoundError(fmt.Errorf("product %s is not found", id))
+		utils.PanicIfNotFoundError(fmt.Errorf("user %s is not found", id))
 		return false
 	}
 
@@ -87,25 +97,33 @@ func (u *_UserRepoImpl) Delete(_ context.Context, id string) bool {
 }
 
 func (u *_UserRepoImpl) Update(_ context.Context, id string, req entities.UserRequest) *entities.User {
-	var selectedUser *entities.User
+	var (
+		selectedUser entities.User
+		isAvailable  = false
+	)
 
 	for index, item := range u.user {
 		if item.ID == id {
-			selectedUser = &item
+			selectedUser = item
 			selectedUser.ID = id
 			selectedUser.Name = req.Name
 			selectedUser.Avatar = generateAvatar(req.Avatar)
 
 			u.user = append(u.user[:index], u.user[index+1:]...)
-			u.user = append(u.user, *selectedUser)
+			u.user = append(u.user, selectedUser)
+			isAvailable = true
+		}
+
+		if isAvailable {
+			break
 		}
 	}
 
-	if selectedUser == nil {
-		utils.PanicIfNotFoundError(fmt.Errorf("product %s is not found", id))
+	if !isAvailable {
+		utils.PanicIfNotFoundError(fmt.Errorf("user %s is not found", id))
 	}
 
-	return selectedUser
+	return &selectedUser
 }
 
 func (u *_UserRepoImpl) DoActivity(_ context.Context, id string) {
@@ -118,5 +136,4 @@ func (u *_UserRepoImpl) DoActivity(_ context.Context, id string) {
 			u.user = append(u.user, selectedUser)
 		}
 	}
-
 }

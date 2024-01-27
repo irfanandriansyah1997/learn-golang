@@ -10,35 +10,30 @@ import (
 )
 
 var (
-	mockProduct = entities.ProductRequest{
-		BaseProduct: entities.BaseProduct{
-			Name:        "Nescafe gold refill 170g",
-			Description: "Tersedia juga nescafe gold altarica dan colombia di etalase kami. silahkan cek dan order..😇",
+	mockUser = entities.UserRequest{
+		BaseUser: entities.BaseUser{
+			Name: "John Doe",
 		},
-		Photos: []string{"https://images.tokopedia.net/sample-image.jpg"},
-		Price:  112500,
+		Avatar: "https://images.tokopedia.net/sample-image.jpg",
 	}
-	mockProduct2 = entities.ProductRequest{
-		BaseProduct: entities.BaseProduct{
-			Name:        "Nescafe latte caramel & mocha",
-			Description: "Nescafe caramel 1 bks isi 20 sachets",
+	mockUser2 = entities.UserRequest{
+		BaseUser: entities.BaseUser{
+			Name: "Jim Morrison",
 		},
-		Photos: []string{"https://images.tokopedia.net/sample-image-2.jpg"},
-		Price:  99900,
+		Avatar: "https://images.tokopedia.net/sample-image-2.jpg",
 	}
 )
 
-func TestProductRepo(t *testing.T) {
-	var productRepo = repositories.NewProductRepo()
-	var selectedProductId string
+func TestUserRepo(t *testing.T) {
+	var userRepo = repositories.NewUserRepo()
+	var selectedUserId string
 
 	t.Run("testing create operation", func(t *testing.T) {
 		// Check result create operation
-		resultCreate := productRepo.Create(context.TODO(), mockProduct)
+		resultCreate := userRepo.Create(context.TODO(), mockUser)
 
-		assert.Equal(t, resultCreate.Name, "Nescafe gold refill 170g")
-		assert.Equal(t, resultCreate.Description, "Tersedia juga nescafe gold altarica dan colombia di etalase kami. silahkan cek dan order..😇")
-		assert.EqualValues(t, resultCreate.Photos[0], entities.Asset{
+		assert.Equal(t, resultCreate.Name, "John Doe")
+		assert.EqualValues(t, resultCreate.Avatar, entities.Asset{
 			UrlPath: "https://images.tokopedia.net/sample-image.jpg",
 			OptimizeAsset: []entities.OptimizeAsset{
 				{Size: entities.MobileRatio, UrlPath: "https://images.tokopedia.net/sample-image-320w.jpg"},
@@ -49,20 +44,19 @@ func TestProductRepo(t *testing.T) {
 		})
 
 		// Compare result create operation & get all data
-		resultFindAll := productRepo.FindAll(context.TODO())
+		resultFindAll := userRepo.FindAll(context.TODO())
 		assert.Len(t, resultFindAll, 1)
 		assert.EqualValues(t, resultFindAll[0], resultCreate)
 
-		selectedProductId = resultCreate.ID
+		selectedUserId = resultCreate.ID
 	})
 
 	t.Run("testing find by id operation", func(t *testing.T) {
-		resultFindById, err := productRepo.FindByID(context.TODO(), selectedProductId)
+		resultFindById, err := userRepo.FindByID(context.TODO(), selectedUserId)
 
 		assert.Nil(t, err)
-		assert.Equal(t, resultFindById.Name, "Nescafe gold refill 170g")
-		assert.Equal(t, resultFindById.Description, "Tersedia juga nescafe gold altarica dan colombia di etalase kami. silahkan cek dan order..😇")
-		assert.EqualValues(t, resultFindById.Photos[0], entities.Asset{
+		assert.Equal(t, resultFindById.Name, "John Doe")
+		assert.EqualValues(t, resultFindById.Avatar, entities.Asset{
 			UrlPath: "https://images.tokopedia.net/sample-image.jpg",
 			OptimizeAsset: []entities.OptimizeAsset{
 				{Size: entities.MobileRatio, UrlPath: "https://images.tokopedia.net/sample-image-320w.jpg"},
@@ -72,18 +66,28 @@ func TestProductRepo(t *testing.T) {
 			FormattedOptimizeAsset: "https://images.tokopedia.net/sample-image-320w.jpg 320w, https://images.tokopedia.net/sample-image-640w.jpg 640w, https://images.tokopedia.net/sample-image-800w.jpg 800w",
 		})
 
-		resultFindById, err = productRepo.FindByID(context.TODO(), "random product id")
-
-		assert.ErrorContains(t, err, "[Not Found]: product random product id is not found")
+		resultFindById, err = userRepo.FindByID(context.TODO(), "random user id")
+		assert.ErrorContains(t, err, "[Not Found]: user random user id is not found")
 		assert.Nil(t, resultFindById)
 	})
 
-	t.Run("testing update operation", func(t *testing.T) {
-		resultUpdate := productRepo.Update(context.TODO(), selectedProductId, mockProduct2)
+	t.Run("testing do activity operation should be working properly", func(t *testing.T) {
+		defer func() {
+			_, ok := recover().(error)
 
-		assert.Equal(t, resultUpdate.Name, "Nescafe latte caramel & mocha")
-		assert.Equal(t, resultUpdate.Description, "Nescafe caramel 1 bks isi 20 sachets")
-		assert.EqualValues(t, resultUpdate.Photos[0], entities.Asset{
+			if ok {
+				t.Errorf("This method should be not throwing error")
+			}
+		}()
+
+		userRepo.DoActivity(context.TODO(), selectedUserId)
+	})
+
+	t.Run("testing update operation", func(t *testing.T) {
+		resultUpdate := userRepo.Update(context.TODO(), selectedUserId, mockUser2)
+
+		assert.Equal(t, resultUpdate.Name, "Jim Morrison")
+		assert.EqualValues(t, resultUpdate.Avatar, entities.Asset{
 			UrlPath: "https://images.tokopedia.net/sample-image-2.jpg",
 			OptimizeAsset: []entities.OptimizeAsset{
 				{Size: entities.MobileRatio, UrlPath: "https://images.tokopedia.net/sample-image-2-320w.jpg"},
@@ -94,53 +98,52 @@ func TestProductRepo(t *testing.T) {
 		})
 
 		// Compare result update operation & get all data
-		resultFindAll := productRepo.FindAll(context.TODO())
-
+		resultFindAll := userRepo.FindAll(context.TODO())
 		assert.Len(t, resultFindAll, 1)
 		assert.EqualValues(t, resultFindAll[0], *resultUpdate)
 	})
 
-	t.Run("testing update operation with product id not found", func(t *testing.T) {
+	t.Run("testing update operation with user id not found", func(t *testing.T) {
 		defer func() {
 			err, ok := recover().(error)
 
 			if ok {
-				assert.ErrorContains(t, err, "[Not Found]: product random id is not found")
+				assert.ErrorContains(t, err, "[Not Found]: user random user id is not found")
 			} else {
 				t.Errorf("This method should be throw error")
 			}
 		}()
 
-		resultUpdate := productRepo.Update(context.TODO(), "random id", mockProduct2)
+		resultUpdate := userRepo.Update(context.TODO(), "random user id", mockUser2)
 		assert.Nil(t, resultUpdate)
 	})
 
-	t.Run("testing delete operation with product id not found", func(t *testing.T) {
+	t.Run("testing delete operation with user not found", func(t *testing.T) {
 		defer func() {
 			err, ok := recover().(error)
 
 			if ok {
-				assert.ErrorContains(t, err, "[Not Found]: product random id is not found")
+				assert.ErrorContains(t, err, "[Not Found]: user random user id is not found")
 			} else {
 				t.Errorf("This method should be throw error")
 			}
 		}()
 
-		resultUpdate := productRepo.Delete(context.TODO(), "random id")
-		assert.Equal(t, resultUpdate, true)
+		resultDelete := userRepo.Delete(context.TODO(), "random user id")
+		assert.Equal(t, resultDelete, false)
 
 		// Compare result delete operation & get all data
-		resultFindAll := productRepo.FindAll(context.TODO())
+		resultFindAll := userRepo.FindAll(context.TODO())
 		assert.Len(t, resultFindAll, 1)
 	})
 
 	t.Run("testing delete operation", func(t *testing.T) {
-		resultUpdate := productRepo.Delete(context.TODO(), selectedProductId)
+		resultDelete := userRepo.Delete(context.TODO(), selectedUserId)
 
-		assert.Equal(t, resultUpdate, true)
+		assert.Equal(t, resultDelete, true)
 
 		// Compare result delete operation & get all data
-		resultFindAll := productRepo.FindAll(context.TODO())
+		resultFindAll := userRepo.FindAll(context.TODO())
 		assert.Len(t, resultFindAll, 0)
 	})
 }

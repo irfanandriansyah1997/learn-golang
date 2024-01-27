@@ -2,7 +2,7 @@ package entities
 
 import "time"
 
-type baseUser struct {
+type BaseUser struct {
 	ID   string `json:"user_id"`
 	Name string `json:"username"`
 }
@@ -13,7 +13,7 @@ type baseUser struct {
 ///////////////////////////////////////////////////////////
 
 type User struct {
-	baseUser
+	BaseUser
 	RegisteredDate   time.Time `json:"registered_date"`
 	LastActivityDate time.Time `json:"last_activity_date"`
 	Avatar           Asset     `json:"avatar"`
@@ -25,6 +25,6 @@ type User struct {
 ///////////////////////////////////////////////////////////
 
 type UserRequest struct {
-	baseUser
+	BaseUser
 	Avatar string `json:"avatar"`
 }

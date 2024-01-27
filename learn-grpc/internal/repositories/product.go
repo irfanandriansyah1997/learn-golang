@@ -22,11 +22,15 @@ func generatePhotos(photos []string) []entities.Asset {
 	return formattedPhotos
 }
 
+type ProductRepo interface {
+	entities.GenericRepo[entities.ProductRequest, entities.Product, string]
+}
+
 type _ProductRepoImpl struct {
 	products []entities.Product
 }
 
-func NewProductRepo() entities.GenericRepo[entities.ProductRequest, entities.Product, string] {
+func NewProductRepo() ProductRepo {
 	return &_ProductRepoImpl{
 		products: make([]entities.Product, 0),
 	}
@@ -53,16 +57,24 @@ func (p *_ProductRepoImpl) FindAll(_ context.Context) []entities.Product {
 }
 
 func (p *_ProductRepoImpl) FindByID(_ context.Context, id string) (*entities.Product, error) {
-	var product *entities.Product
+	var (
+		product     entities.Product
+		isAvailable = false
+	)
 
 	for _, item := range p.products {
-		if item.ID == id {
-			product = &item
+		if item.ID == id && !isAvailable {
+			isAvailable = true
+			product = item
+		}
+
+		if isAvailable {
+			break
 		}
 	}
 
-	if product != nil {
-		return product, nil
+	if isAvailable {
+		return &product, nil
 	}
 
 	return nil, utils.NewNotFoundError(fmt.Sprintf("product %s is not found", id))
@@ -87,11 +99,14 @@ func (p *_ProductRepoImpl) Delete(_ context.Context, id string) bool {
 }
 
 func (p *_ProductRepoImpl) Update(_ context.Context, id string, req entities.ProductRequest) *entities.Product {
-	var selectedProduct *entities.Product
+	var (
+		selectedProduct entities.Product
+		isAvailable     = false
+	)
 
 	for index, item := range p.products {
 		if item.ID == id {
-			selectedProduct = &item
+			isAvailable = true
 			selectedProduct.ID = id
 			selectedProduct.Description = req.Description
 			selectedProduct.Name = req.Name
@@ -102,13 +117,17 @@ func (p *_ProductRepoImpl) Update(_ context.Context, id string, req entities.Pro
 			}
 
 			p.products = append(p.products[:index], p.products[index+1:]...)
-			p.products = append(p.products, *selectedProduct)
+			p.products = append(p.products, selectedProduct)
+		}
+
+		if isAvailable {
+			break
 		}
 	}
 
-	if selectedProduct == nil {
+	if !isAvailable {
 		utils.PanicIfNotFoundError(fmt.Errorf("product %s is not found", id))
 	}
 
-	return selectedProduct
+	return &selectedProduct
 }
